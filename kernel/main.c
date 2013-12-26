@@ -11,12 +11,15 @@
  */
 
 #include "printk.c"
+#include "panic.c"
 
 void kernel_main()
 {
-	terminal_initialize();
+	terminal_initialize(); //Necessary for current VGA output
 	printk("Testing printk:\n");
 	printk("Percent sign: %%\n");
 	printk("String: %s\n", "My string");
 	printk("Both: %s %s\n", "Another string", "fouou");
+	panic("Woah.");
+	printk("This shouldn't print");
 }
