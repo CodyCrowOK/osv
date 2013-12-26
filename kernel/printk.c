@@ -8,56 +8,32 @@
 #include "terminal.h"
 
 void putchar(char c);
-
-terminal_initialize();
-terminal_writestring("Hello, kernel World!\nMore Text.\nLet's try another line.");
+//terminal_writestring("Hello, kernel World!\nMore Text.\nLet's try another line.");
 
 /* Let's just support strings because I don't feel like allowing
  * anything else. It can be casted into a string if it's really 
  * important, and it never is.
  */
 
+// printk: Print kernel messages.
 void printk(const char *fmt, ...)
 {
-va_list argp;
-int i;
-char *s;
-char fmtbuf[256];
-
-va_start(argp, fmt);
-
-for(p = fmt; *p != '\0'; p++)
-	{
-	if(*p != '%')
-		{
-		putchar(*p);
-		continue;
+	va_list args;
+	va_start(args, fmt);
+	for (unsigned int i = 0; i < strlen(fmt); i++) {
+		if (*(fmt + i) != '%') putchar(*(fmt + i));
+		else {
+			if ((*(fmt + ++i)) == 's') { //char after %
+				char *str;
+				str = va_arg(args, char *);
+				for (unsigned int j = 0; j < strlen(str); j++) {
+					putchar(*(str + j));
+				}
+			}
+			else if ((*(fmt + ++i)) == '%') putchar('%');
 		}
-
-	switch(*++p)
-	{
-	case 'c':
-		i = va_arg(argp, int);
-		putchar(i);
-		break;
-
-	case 's':
-		s = va_arg(argp, char *);
-		char *q = &s;
-		while (*q) {
-			putchar(*q);
-			q++;
-			//Wow, I used pointers appropriately.
-		}
-		break;
-
-	case '%':
-		putchar('%');
-		break;
 	}
-	}
-
-va_end(argp);
+	va_end(args);
 }
 
 void putchar(char c)
